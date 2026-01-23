@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniTimetable</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>UniTimetable</h1>
+        <p>Upload your university timetable HTML file to get a clean, colorful version for your group.</p>
+        <input type="file" id="fileInput" accept=".html">
+        <div id="selectors" style="display:none;">
+            <label for="yearSelect">Year:</label>
+            <select id="yearSelect"></select>
+            <label for="semesterSelect">Semester:</label>
+            <select id="semesterSelect"></select>
+            <label for="groupSelect">Group:</label>
+            <select id="groupSelect"></select>
+        </div>
+        <div id="timetable"></div>
+        <button id="downloadBtn" style="display:none;">Download Timetable</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

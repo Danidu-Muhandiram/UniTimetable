@@ -10,57 +10,55 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="main-title">UniTimetable</h1>
-        <h2 class="subtitle">Friendly University Timetable Viewer</h2>
-        <p class="desc">Upload the official timetable HTML file, select your year and subgroup, and instantly get a clean, downloadable class schedule.</p>
-        <div class="upload-card" id="uploadCard">
-            <label for="fileInput" class="upload-label">
-                <input type="file" id="fileInput" accept=".html" style="display:none;">
-                <span id="fileInputIcon" class="upload-icon">📂</span>
-                <span id="fileInputText">Upload official timetable (.html)</span>
-            </label>
-            <div id="fileFeedback" class="file-feedback"></div>
-        </div>
-        <div id="selectors" style="display:none; margin-top: 20px;">
-            <div class="dropdown-row">
-                <label for="yearSelect">Year:</label>
-                <select id="yearSelect"></select>
-                <label for="semesterSelect">Semester:</label>
-                <select id="semesterSelect"></select>
-                <label for="modeSelect">Mode:</label>
-                <select id="modeSelect"></select>
-                <label for="specSelect">Specialization:</label>
-                <select id="specSelect"></select>
-                
-            </div>
-        </div>
-            <div id="selectors" style="display:none; margin-top: 20px;">
-                <div class="filters-card">
-                    <div class="filters-label">Filters</div>
-                    <div class="filters-divider"></div>
-                    <div class="dropdown-row">
-                        <label for="yearSelect">Year:</label>
-                        <select id="yearSelect"></select>
-                        <label for="semesterSelect">Semester:</label>
-                        <select id="semesterSelect"></select>
-                        <label for="modeSelect">Mode:</label>
-                        <select id="modeSelect"></select>
-                        <label for="specSelect">Specialization:</label>
-                        <select id="specSelect"></select>
-                    </div>
+        <div class="main-flex">
+            <div class="sidebar">
+                                <h2 class="sidebar-title">📄 Upload Timetable</h2>
+                                <ul class="sidebar-desc">
+                                    <li>Upload the official timetable HTML</li>
+                                    <li>Select your year & subgroup</li>
+                                    <li>Download a clean schedule</li>
+                                </ul>
+                <div class="upload-card" id="uploadCard">
+                        <label for="fileInput" class="upload-label">
+                                <input type="file" id="fileInput" accept=".html" style="display:none;">
+                                <span id="fileInputIcon" class="upload-icon">📂</span>
+                                <span id="fileInputText">Upload official timetable (.html)</span>
+                        </label>
+                        <div id="fileFeedback" class="file-feedback"></div>
                 </div>
+                <div id="selectors" style="display:none; margin-top: 20px;">
+                        <div class="dropdown-row">
+                                <label for="yearSelect">Year:</label>
+                                <select id="yearSelect"></select>
+                                <label for="semesterSelect">Semester:</label>
+                                <select id="semesterSelect"></select>
+                                <label for="modeSelect">Mode:</label>
+                                <select id="modeSelect"></select>
+                                <label for="specSelect">Specialization:</label>
+                                <select id="specSelect"></select>
+                                <label for="groupSelect">Group:</label>
+                                <select id="groupSelect"></select>
+                                <label for="subgroupSelect">Subgroup:</label>
+                                <select id="subgroupSelect"></select>
+                        </div>
+                </div>
+                <button id="downloadBtn" class="primary-download" style="display:none; margin-top: 24px;"><span class="download-icon">🔍</span> Search for Timetable</button>
+                <div id="feedbackArea">
+                        <div id="loadingSpinner" class="spinner" style="display:none;"></div>
+                        <div id="errorMsg" class="error-msg" style="display:none;"></div>
+                        <div id="emptyMsg" class="empty-msg" style="display:none;"></div>
+                </div>
+                <div class="dark-toggle-row" id="darkToggleRow"><label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider"></span></label> <span class="dark-label">Dark mode</span></div>
             </div>
-        <div id="feedbackArea">
-            <div id="loadingSpinner" class="spinner" style="display:none;"></div>
-            <div id="errorMsg" class="error-msg" style="display:none;"></div>
-            <div id="emptyMsg" class="empty-msg" style="display:none;"></div>
+            <div class="content-area">
+                <div class="content-title">
+                    <h1 class="main-title">UniTimetable</h1>
+                    <div class="tagline">Friendly University Timetable Viewer</div>
+                </div>
+                <div id="timetablePreview" class="timetable-preview" style="display:none;"></div>
+                <div id="timetable" class="timetable-placeholder">Add your timetable HTML first</div>
+            </div>
         </div>
-        <div id="timetablePreview" class="timetable-preview" style="display:none;"></div>
-        <div id="timetable"></div>
-    <div class="dark-toggle-row top-right" id="darkToggleRow"><label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider"></span></label> <span class="dark-label">Dark mode</span></div>
-        <button id="downloadBtn" class="primary-download" style="display:none; margin-top: 24px;"><span class="download-icon">🔍</span> Search for Timetable</button>
-    </div>
     <script src="script.js"></script>
 </body>
 </html>

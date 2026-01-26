@@ -181,6 +181,29 @@ window.addEventListener('DOMContentLoaded', function() {
             }
             // Clone table
             const clone = table.cloneNode(true);
+            
+            (function preCleanTable() {
+                const subgroupKeyFull = buildSubgroupKey(); // e.g. Y3.S1.WE.DS.0102
+                const groupKeyFull = buildGroupKey(); // e.g. Y3.S1.WE.DS.01 (applies to all subgroups)
+                const tds = clone.querySelectorAll('td');
+                tds.forEach(td => {
+                    
+                    if (td.closest('table') !== clone) return;
+                    // skip obvious structural/header cells
+                    if (td.closest('thead') || td.getAttribute('colspan') === '7' || td.classList.contains('meta')) return;
+                    const raw = (td.innerText || '');
+                    const rawCompact = raw.replace(/\s+/g, '');
+                    const esc = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+                    const subRe = new RegExp(esc(subgroupKeyFull) + '(?!\\d)');
+                    const groupRe = new RegExp(esc(groupKeyFull) + '(?!\\d)');
+                    
+                    
+                    const hasAnyGroupToken = /Y\d\.S\d\.[A-Z0-9\.]+/i.test(rawCompact);
+                    if (hasAnyGroupToken && !(subRe.test(rawCompact) || groupRe.test(rawCompact))) {
+                        td.innerHTML = '';
+                    }
+                });
+            })();
             // Process detailed subgroup tables
             const detailedTables = clone.querySelectorAll('table.detailed');
             detailedTables.forEach(dt => {
@@ -193,12 +216,42 @@ window.addEventListener('DOMContentLoaded', function() {
                 // Get the content row (assume next row)
                 const contentRow = headerRow.nextElementSibling;
                 if (!contentRow) return;
-                const contentCell = contentRow.querySelectorAll('td')[idx];
-                if (!contentCell) return;
-                // Replace parent <td> content with only this subgroup's text
+                // Collect all subsequent rows for this column (course, teacher, room, room)
+                const rows = Array.from(dt.querySelectorAll('tr'));
+                const parts = [];
+                for (let r = 1; r < rows.length; r++) {
+                    const tds = rows[r].querySelectorAll('td');
+                    const cell = tds[idx];
+                    if (cell) parts.push(cell.innerHTML.trim());
+                }
+                if (parts.length === 0) return;
+                // Replace parent <td> content with combined parts
                 const parentTd = dt.parentElement;
-                parentTd.innerHTML = cleanText(contentCell.textContent);
+                const temp = document.createElement('div');
+                temp.innerHTML = parts.join('<br>');
+                // Remove group-key tokens from text nodes while preserving HTML structure
+                const groupKeyPattern = /Y\d\.S\d\.[A-Z0-9\.]+/gi;
+                function stripGroupKeys(node) {
+                    if (!node) return;
+                    if (node.nodeType === Node.TEXT_NODE) {
+                        node.textContent = node.textContent.replace(groupKeyPattern, '');
+                        node.textContent = node.textContent.replace(/,+/g, ',').replace(/(^,|,$)/g, '');
+                        if (node.textContent.trim() === '') node.remove();
+                    } else if (node.nodeType === Node.ELEMENT_NODE) {
+                        if (node.tagName.toLowerCase() === 'table') return;
+                        const children = Array.from(node.childNodes);
+                        children.forEach(child => stripGroupKeys(child));
+                    }
+                }
+                stripGroupKeys(temp);
+                let cleanedHTML = temp.innerHTML
+                    .replace(/>\s+</g, '><')
+                    .replace(/(<br\s*\/?>\s*){2,}/gi, '<br>')
+                    .trim();
+                parentTd.innerHTML = cleanedHTML || temp.textContent.trim();
             });
+
+            
             // Show the filtered timetable
             const timetableDiv = document.getElementById('timetable');
             if (timetableDiv) timetableDiv.classList.remove('timetable-placeholder');
@@ -288,7 +341,96 @@ window.addEventListener('DOMContentLoaded', function() {
             })(clone);
 
             timetableDiv.innerHTML = '';
+            // Add export toolbar (PNG / PDF) at the top of the timetable
+            (function addExportToolbar() {
+                // remove existing toolbar if any
+                const prev = document.getElementById('exportToolbar');
+                if (prev) prev.remove();
+                const toolbar = document.createElement('div');
+                toolbar.id = 'exportToolbar';
+                toolbar.style.display = 'flex';
+                toolbar.style.gap = '8px';
+                toolbar.style.marginBottom = '12px';
+
+                const btnPng = document.createElement('button');
+                btnPng.textContent = 'Download PNG';
+                btnPng.className = 'primary-download';
+                btnPng.style.padding = '8px 12px';
+                btnPng.addEventListener('click', function() { exportTimetableAsPNG(clone); });
+
+                const btnPdf = document.createElement('button');
+                btnPdf.textContent = 'Download PDF';
+                btnPdf.className = 'primary-download';
+                btnPdf.style.padding = '8px 12px';
+                btnPdf.addEventListener('click', function() { exportTimetableAsPDF(clone); });
+
+                toolbar.appendChild(btnPng);
+                toolbar.appendChild(btnPdf);
+                timetableDiv.appendChild(toolbar);
+            })();
             timetableDiv.appendChild(clone);
+
+            function loadScript(src) {
+                return new Promise((resolve, reject) => {
+                    if (document.querySelector('script[src="' + src + '"]')) return resolve();
+                    const s = document.createElement('script');
+                    s.src = src;
+                    s.onload = () => resolve();
+                    s.onerror = () => reject(new Error('Failed to load ' + src));
+                    document.head.appendChild(s);
+                });
+            }
+
+            async function ensureLibs() {
+                if (!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+                if (!window.jspdf) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+            }
+
+            async function exportTimetableAsPNG(node) {
+                try {
+                    await ensureLibs();
+                    const opt = { scale: 2, useCORS: true, backgroundColor: null };
+                    const canvas = await window.html2canvas(node, opt);
+                    const dataUrl = canvas.toDataURL('image/png');
+                    const a = document.createElement('a');
+                    a.href = dataUrl;
+                    a.download = 'timetable.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } catch (e) {
+                    alert('Export failed: ' + e.message);
+                }
+            }
+
+            async function exportTimetableAsPDF(node) {
+                try {
+                    await ensureLibs();
+                    const opt = { scale: 2, useCORS: true, backgroundColor: '#ffffff' };
+                    const canvas = await window.html2canvas(node, opt);
+                    const imgData = canvas.toDataURL('image/png');
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+                    const pdfWidth = pdf.internal.pageSize.getWidth();
+                    const pdfHeight = pdf.internal.pageSize.getHeight();
+                    // fit image to page while preserving aspect
+                    const img = new Image();
+                    img.src = imgData;
+                    img.onload = function() {
+                        const imgW = img.width;
+                        const imgH = img.height;
+                        const ratio = Math.min(pdfWidth / imgW, pdfHeight / imgH);
+                        const w = imgW * ratio;
+                        const h = imgH * ratio;
+                        const x = (pdfWidth - w) / 2;
+                        const y = (pdfHeight - h) / 2;
+                        pdf.addImage(imgData, 'PNG', x, y, w, h);
+                        pdf.save('timetable.pdf');
+                    };
+                } catch (e) {
+                    alert('PDF export failed: ' + e.message);
+                }
+            }
         });
     }
 });

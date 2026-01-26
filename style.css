@@ -95,6 +95,18 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
   display: none;
 }
 
+/* Timetable cell spacing: add consistent padding and readable line-height without changing layout */
+#timetable table td {
+  padding: 8px 10px;
+  vertical-align: top;
+  line-height: 1.35;
+}
+
+#timetable table td > * {
+  display: block;
+  margin: 2px 0;
+}
+
 /* Controls and cards */
 .filters-card, .upload-card {
   background: #fff;
@@ -159,3 +171,4 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 @media (max-width: 700px) {
   .primary-download { position: sticky; bottom: 0; left: 0; right: 0; border-radius: 0 0 12px 12px; }
 }
+

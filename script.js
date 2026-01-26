@@ -202,6 +202,91 @@ window.addEventListener('DOMContentLoaded', function() {
             // Show the filtered timetable
             const timetableDiv = document.getElementById('timetable');
             if (timetableDiv) timetableDiv.classList.remove('timetable-placeholder');
+            // Minimal coloring: assign a consistent color per unique cell text
+            (function colorizeSlots(rootTable) {
+                const palette = [
+                    '#bfd8ff', // slightly richer soft blue
+                    '#bff2d6', // slightly richer soft green
+                    '#ffead0', // slightly richer soft orange
+                    '#e6d9ff', // slightly richer soft purple
+                    '#c8f4f7', // slightly richer soft cyan
+                    '#fff1a8', // slightly richer soft yellow
+                    '#ffd6e8', // slightly richer soft pink
+                    '#dfe6ff'  // slightly richer soft indigo
+                ];
+                const map = new Map();
+                let idx = 0;
+
+                function getKey(txt) {
+                    return txt.replace(/\s+/g, ' ').trim();
+                }
+
+                function contrastColor(hex) {
+                    const c = hex.replace('#','');
+                    const r = parseInt(c.substring(0,2),16);
+                    const g = parseInt(c.substring(2,4),16);
+                    const b = parseInt(c.substring(4,6),16);
+                    const yiq = (r*299 + g*587 + b*114) / 1000;
+                    return yiq >= 150 ? '#000000' : '#ffffff';
+                }
+
+                // Only color TDs that belong directly to this table (skip nested table cells)
+                const tds = rootTable.querySelectorAll('td');
+                tds.forEach(td => {
+                    // ensure this td is part of the outer table, not a nested inner table
+                    if (td.closest('table') !== rootTable) return;
+                    const text = getKey(td.textContent || '');
+                    if (!text) return;
+                    // Avoid coloring obvious structural/header cells
+                    if (td.closest('thead') || td.getAttribute('colspan') === '7' || td.classList.contains('meta')) return;
+
+                    // Prefer using a course code (e.g. IT3031) as the color key so room/teacher lines don't split color
+                    const courseMatch = text.match(/\b([A-Z]{1,5}\d{2,4})\b/i);
+                    const key = courseMatch ? courseMatch[1].toUpperCase() : text.split('\n')[0].slice(0,80).trim();
+
+                    // Special-case empty/placeholder slots like '---' — use a light faded gray
+                    if (/^[-\s]{1,}$/.test(key) || key === '---') {
+                        // soft low-intensity color for empty slots
+                        const emptyColor = '#eef2ff';
+                        const textColor = '#0f172a';
+                        td.style.backgroundColor = emptyColor;
+                        td.style.color = textColor;
+                        td.style.borderColor = td.style.borderColor || 'transparent';
+                        const descendants = td.querySelectorAll('*');
+                        descendants.forEach(d => {
+                            try {
+                                d.style.background = 'transparent';
+                                d.style.backgroundColor = 'transparent';
+                                d.style.backgroundImage = 'none';
+                                d.style.color = textColor;
+                            } catch (e) {}
+                        });
+                        return; // skip regular coloring for placeholders
+                    }
+
+                    if (!map.has(key)) {
+                        map.set(key, palette[idx % palette.length]);
+                        idx++;
+                    }
+                    const color = map.get(key);
+                    // Only set inline background and text color
+                    td.style.backgroundColor = color;
+                    td.style.color = contrastColor(color);
+                    // Clear backgrounds on child elements so the entire visible slot shows one color
+                    const descendants = td.querySelectorAll('*');
+                    descendants.forEach(d => {
+                        try {
+                            d.style.background = 'transparent';
+                            d.style.backgroundColor = 'transparent';
+                            d.style.backgroundImage = 'none';
+                            d.style.color = contrastColor(color);
+                        } catch (e) {
+                            
+                        }
+                    });
+                });
+            })(clone);
+
             timetableDiv.innerHTML = '';
             timetableDiv.appendChild(clone);
         });

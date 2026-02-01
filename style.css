@@ -44,10 +44,10 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
   z-index: 9999;
   pointer-events: auto;
 }
-.top-bar .content-title { text-align: center; }
+.top-bar .content-title { text-align: center; position: relative; width: 100%; }
 .top-bar .main-title { font-size: 2.8rem; color: #2563eb; margin: 0; font-weight: 800; }
-.top-bar .tagline { color: #6f88b6; margin-top: 6px; font-weight: 500; }
-.top-bar .dark-toggle-row { position: absolute; right: 24px; }
+.top-bar .tagline { color: #6f88b6; margin-top: 6px; font-weight: 500; font-size: 0.95rem; }
+.top-bar .dark-toggle-row { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); }
 
 /* Main two-column layout */
 .main-flex {
@@ -71,8 +71,8 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
   flex-direction: column;
   gap: 12px;
   position: sticky;
-  top: 0; /* keep at viewport top */
-  z-index: 10001; /* above top bar */
+  top: 0;
+  z-index: 10001;
   overflow-y: auto;
 }
 .sidebar-title { font-size: 1.15rem; color: #2563eb; font-weight: 700; margin: 0 0 8px 0; }
@@ -168,14 +168,129 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 .file-feedback { font-size: 0.98rem; color: #2563eb; }
 
 /* Responsive adjustments */
-@media (max-width: 900px) {
-  .main-flex { flex-direction: column; }
-  .sidebar { position: relative; height: auto; z-index: 10; }
-  .content-area { padding-top: 160px; }
-  .top-bar { height: 140px; }
+@media (max-width: 1024px) {
+  .main-flex { gap: 20px; padding: 0 16px; }
+  .sidebar { flex: 0 0 300px; }
 }
+
+@media (max-width: 900px) {
+  .main-flex { 
+    flex-direction: column; 
+    gap: 0; 
+    padding: 0;
+    padding-top: 100px;
+  }
+  .sidebar { 
+    position: relative; 
+    height: auto;
+    min-height: auto;
+    z-index: 10; 
+    flex: none;
+    width: 100%;
+    padding: 24px 20px;
+    background: linear-gradient(135deg, #fff 90%, #f7f8fa 100%);
+  }
+  .sidebar-title { font-size: 1.2rem; }
+  .sidebar-desc { font-size: 0.95rem; }
+  .content-area { 
+    padding: 20px 16px 80px;
+  }
+  .top-bar { 
+    height: auto;
+    min-height: 100px;
+    padding: 16px 20px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .top-bar .content-title { 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .top-bar .main-title { font-size: 2.2rem; line-height: 1.1; }
+  .top-bar .tagline { font-size: 0.9rem; margin-bottom: 8px; }
+  .top-bar .dark-toggle-row { 
+    position: static;
+    transform: none;
+    margin-top: 0;
+  }
+  .upload-card { max-width: 100%; }
+  .dropdown-row { gap: 14px; }
+}
+
 @media (max-width: 700px) {
-  .primary-download { position: sticky; bottom: 0; left: 0; right: 0; border-radius: 0 0 12px 12px; }
+  .main-flex { padding-top: 110px; }
+  .primary-download { 
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0 !important;
+    border-radius: 0;
+    z-index: 9998;
+    padding: 16px 0;
+    font-size: 1.05rem;
+  }
+  .top-bar { min-height: 110px; padding: 14px 16px; }
+  .top-bar .main-title { font-size: 1.9rem; }
+  .top-bar .tagline { font-size: 0.85rem; margin-bottom: 6px; }
+  .sidebar { padding: 20px 16px 24px; }
+  .dropdown-row { 
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px 12px;
+    align-items: center;
+  }
+  .dropdown-row label { 
+    font-size: 0.95rem;
+    text-align: right;
+    min-width: 110px;
+  }
+  .dropdown-row select { 
+    width: 100%;
+    padding: 10px 14px;
+    font-size: 16px;
+    border-radius: 8px;
+  }
+  .upload-label {
+    width: 100%;
+    text-align: center;
+    padding: 14px 20px;
+    font-size: 1rem;
+    display: block;
+  }
+  #timetable table {
+    font-size: 11px;
+  }
+  #timetable tbody td {
+    padding: 4px 6px;
+    line-height: 1.3;
+  }
+  #timetable thead th {
+    padding: 8px 4px;
+    font-size: 12px;
+  }
+  .content-area { padding-bottom: 100px; }
+}
+
+@media (max-width: 480px) {
+  .main-flex { padding-top: 120px; }
+  .sidebar { padding: 18px 12px 20px; }
+  .content-area { padding: 16px 12px 100px; }
+  .top-bar { min-height: 120px; padding: 12px; }
+  .top-bar .main-title { font-size: 1.6rem; }
+  .top-bar .tagline { font-size: 0.8rem; }
+  .dropdown-row label { min-width: 95px; font-size: 0.9rem; }
+  .dropdown-row select { padding: 9px 12px; font-size: 16px; }
+  #exportToolbar {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  #exportToolbar button {
+    width: 100%;
+    padding: 12px !important;
+  }
 }
 
 /* Timetable area with improved typography and spacing */

@@ -49,7 +49,6 @@ window.addEventListener('DOMContentLoaded', function() {
     const specSelect = document.getElementById('specSelect');
     const modeSelect = document.getElementById('modeSelect');
     const groupSelect = document.getElementById('groupSelect');
-    const subgroupSelect = document.getElementById('subgroupSelect');
 
     if (yearSelect) {
         yearSelect.innerHTML = '';
@@ -100,18 +99,8 @@ window.addEventListener('DOMContentLoaded', function() {
             groupSelect.appendChild(opt);
         }
     }
-    if (subgroupSelect) {
-        subgroupSelect.innerHTML = '';
-        ['01','02'].forEach(sg => {
-            const opt = document.createElement('option');
-            opt.value = sg;
-            opt.textContent = sg;
-            subgroupSelect.appendChild(opt);
-        });
-    }
 
     // Main timetable search and filter logic
-    let timetableHTML = '';
     let timetableDoc = null;
     if (fileInput) {
         fileInput.addEventListener('change', function() {
@@ -123,8 +112,7 @@ window.addEventListener('DOMContentLoaded', function() {
             }
             const reader = new FileReader();
             reader.onload = function(e) {
-                timetableHTML = e.target.result;
-                timetableDoc = new DOMParser().parseFromString(timetableHTML, 'text/html');
+                timetableDoc = new DOMParser().parseFromString(e.target.result, 'text/html');
                 if (feedback) {
                     const now = new Date();
                     feedback.innerHTML = `<div class="file-success"><span class="file-success-icon">✔</span> Timetable loaded successfully<br><span class="file-success-name">${file.name}</span> <span class="file-success-time">${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span></div>`;
@@ -144,26 +132,11 @@ window.addEventListener('DOMContentLoaded', function() {
         ].join('.');
     }
 
-    function buildSubgroupKey() {
-        return buildGroupKey() + subgroupSelect.value;
-    }
-
-    function cleanText(txt) {
-        // Remove group keys, extra commas, duplicate spaces
-        return txt.replace(/Y\d\.S\d\.[A-Z]{2}\.[A-Z]+\.\d{2}\d{2}/g, '')
-                  .replace(/Y\d\.S\d\.[A-Z]{2}\.[A-Z]+\.\d{2}/g, '')
-                  .replace(/\s+/g, ' ')
-                  .replace(/,+/g, ',')
-                  .replace(/^,|,$/g, '')
-                  .trim();
-    }
-
     // Search button click handler
     if (searchBtn) {
         searchBtn.addEventListener('click', function() {
             if (!timetableDoc) return;
             const groupKey = buildGroupKey();
-            const subgroup = subgroupSelect.value;
             // Find the correct table by group key (manual search, :contains not supported)
             let table = null;
             const ths = timetableDoc.querySelectorAll('th[colspan="7"]');
@@ -183,73 +156,26 @@ window.addEventListener('DOMContentLoaded', function() {
             const clone = table.cloneNode(true);
             
             (function preCleanTable() {
-                const subgroupKeyFull = buildSubgroupKey(); // e.g. Y3.S1.WE.DS.0102
-                const groupKeyFull = buildGroupKey(); // e.g. Y3.S1.WE.DS.01 (applies to all subgroups)
-                const tds = clone.querySelectorAll('td');
+                // Flatten subgroup tables so each slot is a single colored block
+                const tds = Array.from(clone.querySelectorAll('td'));
                 tds.forEach(td => {
-                    
-                    if (td.closest('table') !== clone) return;
-                    // skip obvious structural/header cells
-                    if (td.closest('thead') || td.getAttribute('colspan') === '7' || td.classList.contains('meta')) return;
-                    const raw = (td.innerText || '');
-                    const rawCompact = raw.replace(/\s+/g, '');
-                    const esc = s => s.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-                    const subRe = new RegExp(esc(subgroupKeyFull) + '(?!\\d)');
-                    const groupRe = new RegExp(esc(groupKeyFull) + '(?!\\d)');
-                    
-                    
-                    const hasAnyGroupToken = /Y\d\.S\d\.[A-Z0-9\.]+/i.test(rawCompact);
-                    if (hasAnyGroupToken && !(subRe.test(rawCompact) || groupRe.test(rawCompact))) {
-                        td.innerHTML = '';
-                    }
+                    const innerTable = td.querySelector('table');
+                    if (!innerTable) return;
+
+                    // Grab all text nodes within the inner table rows
+                    const lines = [];
+                    innerTable.querySelectorAll('tr').forEach(tr => {
+                        const line = Array.from(tr.querySelectorAll('td'))
+                            .map(cell => cell.textContent.trim())
+                            .filter(Boolean)
+                            .join(' ')
+                            .trim();
+                        if (line) lines.push(line);
+                    });
+
+                    td.innerHTML = lines.join('<br>');
                 });
             })();
-            // Process detailed subgroup tables
-            const detailedTables = clone.querySelectorAll('table.detailed');
-            detailedTables.forEach(dt => {
-                // Find subgroup header row
-                const headerRow = dt.querySelector('tr');
-                if (!headerRow) return;
-                const headers = Array.from(headerRow.querySelectorAll('td')).map(td => td.textContent.trim());
-                const idx = headers.findIndex(h => h.endsWith(subgroup));
-                if (idx === -1) return;
-                // Get the content row (assume next row)
-                const contentRow = headerRow.nextElementSibling;
-                if (!contentRow) return;
-                // Collect all subsequent rows for this column (course, teacher, room, room)
-                const rows = Array.from(dt.querySelectorAll('tr'));
-                const parts = [];
-                for (let r = 1; r < rows.length; r++) {
-                    const tds = rows[r].querySelectorAll('td');
-                    const cell = tds[idx];
-                    if (cell) parts.push(cell.innerHTML.trim());
-                }
-                if (parts.length === 0) return;
-                // Replace parent <td> content with combined parts
-                const parentTd = dt.parentElement;
-                const temp = document.createElement('div');
-                temp.innerHTML = parts.join('<br>');
-                // Remove group-key tokens from text nodes while preserving HTML structure
-                const groupKeyPattern = /Y\d\.S\d\.[A-Z0-9\.]+/gi;
-                function stripGroupKeys(node) {
-                    if (!node) return;
-                    if (node.nodeType === Node.TEXT_NODE) {
-                        node.textContent = node.textContent.replace(groupKeyPattern, '');
-                        node.textContent = node.textContent.replace(/,+/g, ',').replace(/(^,|,$)/g, '');
-                        if (node.textContent.trim() === '') node.remove();
-                    } else if (node.nodeType === Node.ELEMENT_NODE) {
-                        if (node.tagName.toLowerCase() === 'table') return;
-                        const children = Array.from(node.childNodes);
-                        children.forEach(child => stripGroupKeys(child));
-                    }
-                }
-                stripGroupKeys(temp);
-                let cleanedHTML = temp.innerHTML
-                    .replace(/>\s+</g, '><')
-                    .replace(/(<br\s*\/?>\s*){2,}/gi, '<br>')
-                    .trim();
-                parentTd.innerHTML = cleanedHTML || temp.textContent.trim();
-            });
 
             
             // Show the filtered timetable
@@ -283,11 +209,10 @@ window.addEventListener('DOMContentLoaded', function() {
                     return yiq >= 150 ? '#000000' : '#ffffff';
                 }
 
-                // Only color TDs that belong directly to this table (skip nested table cells)
-                const tds = rootTable.querySelectorAll('td');
+                // Color top-level TDs and ensure any nested cells use the same background
+                // so the slot appears as a single colored block.
+                const tds = Array.from(rootTable.querySelectorAll('td')).filter(td => td.closest('table') === rootTable);
                 tds.forEach(td => {
-                    // ensure this td is part of the outer table, not a nested inner table
-                    if (td.closest('table') !== rootTable) return;
                     const text = getKey(td.textContent || '');
                     if (!text) return;
                     // Avoid coloring obvious structural/header cells
@@ -304,16 +229,6 @@ window.addEventListener('DOMContentLoaded', function() {
                         const textColor = '#0f172a';
                         td.style.backgroundColor = emptyColor;
                         td.style.color = textColor;
-                        td.style.borderColor = td.style.borderColor || 'transparent';
-                        const descendants = td.querySelectorAll('*');
-                        descendants.forEach(d => {
-                            try {
-                                d.style.background = 'transparent';
-                                d.style.backgroundColor = 'transparent';
-                                d.style.backgroundImage = 'none';
-                                d.style.color = textColor;
-                            } catch (e) {}
-                        });
                         return; // skip regular coloring for placeholders
                     }
 
@@ -325,18 +240,6 @@ window.addEventListener('DOMContentLoaded', function() {
                     // Only set inline background and text color
                     td.style.backgroundColor = color;
                     td.style.color = contrastColor(color);
-                    // Clear backgrounds on child elements so the entire visible slot shows one color
-                    const descendants = td.querySelectorAll('*');
-                    descendants.forEach(d => {
-                        try {
-                            d.style.background = 'transparent';
-                            d.style.backgroundColor = 'transparent';
-                            d.style.backgroundImage = 'none';
-                            d.style.color = contrastColor(color);
-                        } catch (e) {
-                            
-                        }
-                    });
                 });
             })(clone);
 

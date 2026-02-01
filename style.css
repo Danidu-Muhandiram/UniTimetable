@@ -87,11 +87,7 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
   min-height: 300px;
 }
 .timetable-preview {
-  background: #f7f8fa;
-  border: 1.5px solid #e3e6ee;
-  border-radius: 13px;
   padding: 18px;
-  box-shadow: 0 1.5px 6px rgba(37,99,235,0.04);
   display: none;
 }
 
@@ -175,7 +171,7 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 /* Final timetable visual style overrides (appended) */
 #timetable { --line: rgba(0,0,0,0.18); --time-bg: #cce8ff; --day-bg: #ffb36b; }
 
-#timetable table { border-collapse: separate; border-spacing: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+#timetable table { border-collapse: separate; border-spacing: 0; border: 1px solid var(--line); overflow: hidden; }
 
 /* Day header row: stronger orange background, white bold text */
 #timetable thead th, #timetable table th[colspan] { background: var(--day-bg) !important; color: #ffffff !important; font-weight: 900; padding: 12px 14px; text-align: left; border-bottom: 2px solid rgba(0,0,0,0.08); }

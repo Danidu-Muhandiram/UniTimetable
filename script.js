@@ -84,6 +84,16 @@ function toggleSearchUI(show, ui) {
         ui.timetable.classList.toggle('timetable-placeholder', !show);
         ui.timetable.innerHTML = show ? '' : '<div class="empty-main">Upload your timetable to get started!</div>';
     }
+    
+    // Auto-scroll to show filters when file is uploaded
+    if (show && ui.selectorsCard) {
+        setTimeout(() => {
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.scrollTo({ top: ui.selectorsCard.offsetTop - 20, behavior: 'smooth' });
+            }
+        }, 100);
+    }
 }
 
 function hookSearch(ui) {

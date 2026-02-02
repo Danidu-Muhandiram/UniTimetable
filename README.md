@@ -17,11 +17,12 @@ Transform your timetable from cluttered to clean:
 
 <div align="center">
   
-[![🚀 Try It Now](https://img.shields.io/badge/🚀_Try_It_Now-FF6B6B?style=for-the-badge&labelColor=4ECDC4&logoColor=white)]([https://yourwebsite.com](https://universitytimetable.vercel.app/))
+[![🚀 Try It Now](https://img.shields.io/badge/🚀_Try_It_Now-FF6B6B?style=for-the-badge&labelColor=4ECDC4&logoColor=white)]([https://universitytimetable.vercel.app/])
 [![⭐ Star This Repo](https://img.shields.io/badge/⭐_Star_This_Repo-FFD93D?style=for-the-badge&labelColor=6BCB77&logoColor=white)](https://github.com/Danidu-Muhandiram/unitimetable)
 
 </div>
 
+<br>
 
 ## 📖 How to Use
 
@@ -44,13 +45,13 @@ Transform your timetable from cluttered to clean:
    - Click "Download PNG" for an image file 🖼️
    - Click "Download PDF" for a printable document 📄
 
-
+<br>
 
 ## 🚀 Future Development
 
 - 🔄 **Subgroup Filtering** - Filter and view specific subgroups within your selected group
 
-
+<br>
 
 ## 🛠️ Technologies Used
 
@@ -59,6 +60,8 @@ Transform your timetable from cluttered to clean:
 - **Vanilla JavaScript** - All functionality, no frameworks
 - **html2canvas** - PNG export functionality
 - **jsPDF** - PDF export functionality
+
+<br>
 
 ## 📁 File Structure
 
@@ -73,4 +76,5 @@ UniTimetable/
 ## License
 
 Free to use for personal and educational purposes.
+
 

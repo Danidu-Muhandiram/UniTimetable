@@ -53,10 +53,10 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 /* Main two-column layout */
 .main-flex {
   display: flex;
-  gap: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 120px 20px 20px; /* desktop, keep content just below the fixed header */
+  gap: 0;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
   min-height: 100vh;
   box-sizing: border-box;
 }
@@ -65,16 +65,18 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 .sidebar {
   flex: 0 0 340px;
   background: linear-gradient(135deg, #fff 80%, #f7f8fa 100%);
-  padding: 32px 16px 16px 16px;
+  padding: 120px 16px 16px 16px;
   height: 100vh;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 12px;
   align-items: center;
-  position: sticky;
-  top: 0; /* keep at viewport top */
-  z-index: 10001; /* above top bar */
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 10000;
   overflow-y: auto;
   overflow-x: hidden;
   transition: flex-basis 0.2s ease, padding 0.2s ease;
@@ -93,10 +95,10 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 .content-area {
   flex: 1 1 0%;
   min-width: 0;
-  padding: 20px 24px 24px 24px;
+  margin-left: 340px;
+  padding: 136px 24px 24px 24px;
   box-sizing: border-box;
   overflow-y: auto;
-  padding-top: 136px;
 }
 
 /* Timetable placeholder and preview */
@@ -182,24 +184,18 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 .file-feedback { font-size: 0.98rem; color: #2563eb; }
 
 /* Responsive adjustments */
-@media (min-width: 901px) {
-  .main-flex {
-    max-width: none;
-    margin: 0;
-    padding: 0 0 20px; /* sidebar starts at top edge */
-  }
+@media (min-width: 1201px) {
   .sidebar {
-    height: 100vh;
-    overflow-y: auto;
-    padding-top: 113px; /* minimal gap under fixed header */
-    padding-bottom: 24px;
+    padding-top: 120px;
   }
-  .content-area { padding-top: 113px; }
 }
 
-@media (max-width: 1200px) {
-  .main-flex { gap: 20px; padding: 120px 16px 18px; }
-  .sidebar { flex: 0 0 300px; }
+@media (min-width: 901px) and (max-width: 1200px) {
+  .sidebar { 
+    flex: 0 0 300px;
+    width: 300px;
+  }
+  .content-area { margin-left: 300px; }
 }
 
 @media (max-width: 1024px) {
@@ -210,16 +206,24 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 }
 
 @media (max-width: 900px) {
-  .main-flex { flex-direction: column; padding: 126px 14px 18px; }
+  .main-flex { flex-direction: column; padding: 130px 14px 18px; }
   .sidebar {
     position: relative;
+    left: auto;
+    top: auto;
+    bottom: auto;
     height: auto;
     z-index: 10;
     flex: 1 1 auto;
     padding: 24px 16px 20px;
     max-width: 100%;
+    width: 100%;
+    overflow-y: visible;
   }
-  .content-area { padding-top: 136px; }
+  .content-area { 
+    margin-left: 0;
+    padding-top: 136px; 
+  }
   .top-bar { height: 118px; }
 }
 
@@ -235,13 +239,13 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 }
 
 @media (max-width: 540px) {
-  .top-bar { height: auto; padding: 14px 12px 10px; }
+  .top-bar { height: auto; padding: 14px 12px 12px; }
   .top-bar .content-title { width: 100%; }
   .top-bar .main-title { font-size: 1.8rem; }
-  .tagline { font-size: 0.9rem; }
-  .dark-toggle-row { position: static; margin-top: 10px; justify-content: center; }
-  .main-flex { padding: 120px 10px 16px; }
-  .content-area { padding: 12px; padding-top: 126px; }
+  .tagline { font-size: 0.9rem; margin-bottom: 0; }
+  .dark-toggle-row { position: static; margin-top: 12px; justify-content: center; }
+  .main-flex { padding: 136px 10px 16px; }
+  .content-area { padding: 12px; padding-top: 136px; }
   .sidebar { padding: 20px 14px; }
   .upload-label { width: 100%; text-align: center; }
   .dropdown-row { flex-direction: column; align-items: stretch; }

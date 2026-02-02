@@ -213,6 +213,7 @@ function buildExportToolbar(onPng, onPdf) {
     bar.style.display = 'flex';
     bar.style.gap = '8px';
     bar.style.marginBottom = '12px';
+    bar.style.marginTop = '0';
 
     const pngBtn = document.createElement('button');
     pngBtn.textContent = 'Download PNG';

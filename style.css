@@ -135,7 +135,7 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
   box-shadow: 0 6px 20px rgba(22,38,78,0.03);
 }
 .filters-card { max-width: 520px; margin: 0 auto; }
-.upload-card { align-items: center; max-width: 280px; }
+.upload-card { align-items: center; max-width: 280px; display: flex; flex-direction: column; }
 
 .filters-label { font-size: 1.02rem; color: #2563eb; font-weight: 600; margin-bottom: 8px; }
 .filters-divider { height: 1.5px; background: #eaeef6; margin: 12px 0; }
@@ -181,7 +181,10 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 /* Utility */
 .empty-illustration { font-size: 3.2rem; margin-bottom: 8px; }
 .empty-main { font-size: 1.15rem; color: #4f6fa6; }
-.file-feedback { font-size: 0.98rem; color: #2563eb; }
+.file-feedback { font-size: 0.98rem; color: #2563eb; margin-top: 12px; word-wrap: break-word; overflow-wrap: break-word; }
+.file-success { display: block; }
+.file-success-name { display: block; font-size: 0.85rem; margin-top: 4px; }
+.file-success-time { font-size: 0.85rem; }
 
 /* Responsive adjustments */
 @media (min-width: 1201px) {
@@ -239,20 +242,35 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 }
 
 @media (max-width: 540px) {
-  .top-bar { height: auto; padding: 14px 12px 12px; }
+  .top-bar { 
+    height: auto; 
+    padding: 14px 12px 14px;
+    flex-direction: column;
+  }
   .top-bar .content-title { width: 100%; }
   .top-bar .main-title { font-size: 1.8rem; }
   .tagline { font-size: 0.9rem; margin-bottom: 0; }
-  .dark-toggle-row { position: static; margin-top: 12px; justify-content: center; }
-  .main-flex { padding: 136px 10px 16px; }
-  .content-area { padding: 12px; padding-top: 136px; }
+  .top-bar .dark-toggle-row { 
+    position: static;
+    right: auto;
+    margin-top: 12px;
+    justify-content: center;
+  }
+  .main-flex { padding: 150px 10px 16px; }
+  .content-area { 
+    margin-left: 0;
+    padding: 12px; 
+    padding-top: 150px; 
+  }
   .sidebar { padding: 20px 14px; }
   .upload-label { width: 100%; text-align: center; }
+  .upload-card { max-width: 100%; }
   .dropdown-row { flex-direction: column; align-items: stretch; }
   .filters-card { padding: 16px; }
   .upload-card { padding: 16px; }
   #timetable table { font-size: 0.95rem; }
   #timetable tbody td { padding: 6px; }
+  #exportToolbar { margin-top: 8px; }
 }
 
 @media (max-width: 400px) {

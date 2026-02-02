@@ -1,9 +1,10 @@
-﻿# 📅 UniTimetable (SLIIT)
+﻿# 📅 UniTimetable (SLIIT) 
 <br>
 Convert the **official SLIIT FET-generated timetable** into a clean, colorful, and student-friendly version - in just one click. ✨
 
 No more boring tables. Download your timetable as **PNG** 🖼️ or **PDF** 📄.
 
+[![🚀 Try It Now](https://img.shields.io/badge/🚀_Try_It_Now-FF6B6B?style=for-the-badge&labelColor=4ECDC4&logoColor=white)](https://universitytimetable.vercel.app/)
 
 <br>
 
@@ -76,6 +77,7 @@ UniTimetable/
 ## License
 
 Free to use for personal and educational purposes.
+
 
 
 

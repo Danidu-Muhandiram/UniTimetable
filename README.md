@@ -54,29 +54,11 @@ Transform your timetable from cluttered to clean:
 
 <br>
 
-## 🛠️ Technologies Used
-
-- **HTML5** - Structure and markup
-- **CSS3** - Styling and responsive design
-- **Vanilla JavaScript** - All functionality, no frameworks
-- **html2canvas** - PNG export functionality
-- **jsPDF** - PDF export functionality
-
-<br>
-
-## 📁 File Structure
-
-```
-UniTimetable/
-├── index.html          # Main HTML structure
-├── style.css           # All styling and themes
-├── script.js           # Core functionality
-└── README.md           # Readme
-```
 
 ## License
 
 Free to use for personal and educational purposes.
+
 
 
 

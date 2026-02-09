@@ -55,10 +55,23 @@ Transform your timetable from cluttered to clean:
 <br>
 
 
-## License
+## 📄 License
 
 Free to use for personal and educational purposes.
+Commercial use is not permitted without permission.
 
+## 👤 Author
+Built by **Danidu Muhandiram** ([@Danidu-Muhandiram](https://github.com/Danidu-Muhandiram))
+
+
+## 📊 Project Stats
+
+⭐ **If you found this project helpful, please give it a star!** ⭐
+
+![GitHub stars](https://img.shields.io/github/stars/Danidu-Muhandiram/UniTimetable?style=social)
+![GitHub forks](https://img.shields.io/github/forks/Danidu-Muhandiram/UniTimetable?style=social)
+![GitHub issues](https://img.shields.io/github/issues/Danidu-Muhandiram/UniTimetable)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/Danidu-Muhandiram/UniTimetable)
 
 
 

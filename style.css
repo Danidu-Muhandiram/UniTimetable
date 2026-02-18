@@ -140,9 +140,28 @@ body.dark .upload-label:hover, body.dark .primary-download:hover, body.dark butt
 .filters-label { font-size: 1.02rem; color: #2563eb; font-weight: 600; margin-bottom: 8px; }
 .filters-divider { height: 1.5px; background: #eaeef6; margin: 12px 0; }
 
-.dropdown-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
-.dropdown-row label { font-size: 1.06rem; color: #222; }
-.dropdown-row select { padding: 8px 14px; border-radius: 8px; border: 1.5px solid #d1d5db; background: #f8fafc; }
+#selectors { 
+  width: 100%; 
+  max-width: 280px; 
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.dropdown-row { 
+  display: flex; 
+  flex-direction: column;
+  gap: 16px; 
+  align-items: stretch; 
+}
+.dropdown-row label { font-size: 1.02rem; color: #222; font-weight: 500; }
+.dropdown-row select { 
+  padding: 8px 14px; 
+  border-radius: 8px; 
+  border: 1.5px solid #d1d5db; 
+  background: #f8fafc;
+  width: 100%;
+  box-sizing: border-box;
+}
 
 .upload-label {
   display: block;

@@ -342,6 +342,10 @@ body.dark {
 }
 
 /* Timetable area with improved typography and spacing */
+.export-toolbar-container {
+  margin-bottom: 14px;
+}
+
 #timetable {
   overflow-x: auto;
   background: var(--surface);
@@ -360,11 +364,11 @@ body.dark {
   border-style: dashed;
 }
 
-/* Tighter cell spacing for better readability */
+/* Tighter square cell spacing for clean table look */
 #timetable tbody td {
   line-height: 1.3;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 0;
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.08);
 }
 
@@ -372,11 +376,12 @@ body.dark {
 #timetable thead th {
   padding: 12px 0;
   font-size: 0.95rem;
+  border-radius: 0;
 }
 
 /* Timetable header column */
 #timetable tbody > tr > th {
-  border-radius: 10px;
+  border-radius: 0;
 }
 
 #exportToolbar {
@@ -397,4 +402,57 @@ body.dark {
   opacity: 0.8;
   display: block;
   margin-top: 4px;
+}
+
+/* Timetable Group Header Banner */
+.timetable-caption-banner {
+  caption-side: top;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.tt-banner-wrapper {
+  background: linear-gradient(135deg, var(--accent-2) 0%, #1d4ed8 100%);
+  color: #ffffff;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.tt-institution {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
+}
+
+.tt-group-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+body.dark .tt-banner-wrapper {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Detailed subgroup sub-table formatting */
+#timetable table.detailed {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 3px;
+  margin: 0;
+}
+
+#timetable table.detailed td.detailed {
+  border: 1px solid var(--border);
+  border-radius: 0;
 }

@@ -262,6 +262,7 @@ function isEmptySlot(text) {
 }
 
 // Apply colors to make the timetable easier to read at a glance
+// Apply colors to make the timetable easier to read at a glance
 function colorizeCells(table) {
     const palette = [
         '#bfd8ff', '#bff2d6', '#ffead0', '#e6d9ff',
@@ -290,7 +291,17 @@ function colorizeCells(table) {
     });
 
     // Color timetable slots
-    const cells = Array.from(table.querySelectorAll('tbody td'));
+    const cells = [];
+    Array.from(table.tBodies).forEach(tbody => {
+        Array.from(tbody.rows).forEach(tr => {
+            Array.from(tr.cells).forEach(cell => {
+                if (cell.tagName.toLowerCase() === 'td') {
+                    cells.push(cell);
+                }
+            });
+        });
+    });
+    
     cells.forEach(td => {
         // If cell contains a detailed sub-table (subgroups)
         const subTable = td.querySelector('table.detailed');
@@ -298,42 +309,67 @@ function colorizeCells(table) {
             td.style.backgroundColor = 'transparent';
             td.style.padding = '4px';
 
-            const subCells = subTable.querySelectorAll('td.detailed');
-            subCells.forEach(subTd => {
-                const subText = subTd.textContent.trim();
+            const rows = Array.from(subTable.querySelectorAll('tr'));
+            if (rows.length > 0) {
+                const numCols = Math.max(...rows.map(r => r.cells.length));
+                for (let c = 0; c < numCols; c++) {
+                    let courseKey = null;
+                    const colCells = [];
 
-                // If sub-cell is a subgroup header (e.g. Y2.S1.WE.IT.0101)
-                if (/Y[1-4]\.S[1-2]\.(?:WD|WE)\.[A-Z0-9]+/i.test(subText)) {
-                    subTd.style.backgroundColor = '#e2e8f0';
-                    subTd.style.color = '#334155';
-                    subTd.style.fontWeight = '700';
-                    subTd.style.fontSize = '0.8rem';
-                    subTd.style.padding = '4px 6px';
-                    subTd.style.textAlign = 'center';
-                    return;
+                    // Scan all cells in column c to find the course/module code
+                    for (let r = 0; r < rows.length; r++) {
+                        const cell = rows[r].cells[c];
+                        if (cell) {
+                            colCells.push({ cell, rowIndex: r });
+                            const text = cell.textContent.trim();
+                            if (!courseKey && !isEmptySlot(text)) {
+                                const courseMatch = text.match(/\b[A-Z]{2,5}\d{2,4}\b/);
+                                if (courseMatch) {
+                                    courseKey = courseMatch[0];
+                                }
+                            }
+                        }
+                    }
+
+                    // Determine cohesive color for this column based on the course key
+                    let color = null;
+                    if (courseKey) {
+                        if (!cache.has(courseKey)) {
+                            cache.set(courseKey, palette[idx % palette.length]);
+                            idx++;
+                        }
+                        color = cache.get(courseKey);
+                    }
+
+                    // Apply the cohesive color to all cells in this column (subgroup)
+                    colCells.forEach(({ cell, rowIndex }) => {
+                        const text = cell.textContent.trim();
+                        const isHeader = rowIndex === 0 || /Y[1-4]\.S[1-2]\.(?:WD|WE)\.[A-Z0-9]+/i.test(text);
+
+                        if (isHeader) {
+                            cell.style.backgroundColor = color || '#e2e8f0';
+                            cell.style.color = color ? '#1c1f2a' : '#334155';
+                            cell.style.fontWeight = '700';
+                            cell.style.fontSize = '0.8rem';
+                            cell.style.padding = '4px 6px';
+                            cell.style.textAlign = 'center';
+                        } else {
+                            if (isEmptySlot(text)) {
+                                cell.style.backgroundColor = color || '#f1f5f9';
+                                cell.style.color = color ? '#1c1f2a' : '#94a3b8';
+                                cell.textContent = '-';
+                                cell.style.padding = '6px 8px';
+                                cell.style.borderRadius = '0';
+                            } else {
+                                cell.style.backgroundColor = color || '#f1f5f9';
+                                cell.style.color = '#1c1f2a';
+                                cell.style.padding = '6px 8px';
+                                cell.style.borderRadius = '0';
+                            }
+                        }
+                    });
                 }
-
-                if (isEmptySlot(subText)) {
-                    subTd.style.backgroundColor = '#f1f5f9';
-                    subTd.style.color = '#94a3b8';
-                    subTd.textContent = '-';
-                    return;
-                }
-
-                let key = subText;
-                const courseMatch = subText.match(/\b[A-Z]{2,5}\d{2,4}\b/);
-                if (courseMatch) key = courseMatch[0];
-
-                if (!cache.has(key)) {
-                    cache.set(key, palette[idx % palette.length]);
-                    idx++;
-                }
-                const color = cache.get(key);
-                subTd.style.backgroundColor = color;
-                subTd.style.color = '#1c1f2a';
-                subTd.style.padding = '6px 8px';
-                subTd.style.borderRadius = '0';
-            });
+            }
             return;
         }
 
@@ -455,3 +491,5 @@ async function exportTimetableAsPDF(node) {
         alert('PDF export failed: ' + err.message);
     }
 }
+
+

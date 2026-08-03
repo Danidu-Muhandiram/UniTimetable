@@ -1,4 +1,4 @@
-const state = { doc: null, parsedGroups: null };
+const state = { doc: null, parsedGroups: null, selectedPaletteIndex: 0, ui: null };
 
 window.addEventListener('DOMContentLoaded', () => {
     const ui = {
@@ -16,6 +16,7 @@ window.addEventListener('DOMContentLoaded', () => {
         exportContainer: document.getElementById('exportToolbarContainer')
     };
 
+    state.ui = ui;
     applyStoredTheme(ui.darkToggle);
     populateSelectors(ui);
     hookFileUpload(ui);
@@ -267,10 +268,18 @@ function isEmptySlot(text) {
 // Apply colors to make the timetable easier to read at a glance
 // Apply colors to make the timetable easier to read at a glance
 function colorizeCells(table) {
-    const palette = [
-        '#bfd8ff', '#bff2d6', '#ffead0', '#e6d9ff',
-        '#c8f4f7', '#fff1a8', '#ffd6e8', '#dfe6ff'
+    const paletteOptions = [
+        // Classic Pastels (Original)
+        ['#bfd8ff', '#bff2d6', '#ffead0', '#e6d9ff', '#c8f4f7', '#fff1a8', '#ffd6e8', '#dfe6ff'],
+        // Ocean Pastels
+        ['#b3e5fc', '#b2dfdb', '#e0f2f1', '#e8eaf6', '#d1c4e9', '#e0f7fa', '#c5cae9', '#e3f2fd'],
+        // Sunset Pastels
+        ['#ffcdd2', '#ffe0b2', '#fff9c4', '#f8bbd0', '#ffecb3', '#ffebd2', '#ffe4e1', '#fff5ee'],
+        // Botanical Pastels
+        ['#d7ccc8', '#f0f4c3', '#e8f5e9', '#f1f8e9', '#dcedc8', '#e8ebd0', '#f5f5dc', '#faf0e6']
     ];
+    const paletteIndex = state.selectedPaletteIndex || 0;
+    const palette = paletteOptions[paletteIndex];
     const cache = new Map();
     let idx = 0;
 
@@ -416,6 +425,8 @@ function buildExportToolbar(onPng, onPdf) {
     bar.style.gap = '8px';
     bar.style.marginBottom = '16px';
     bar.style.marginTop = '0';
+    bar.style.alignItems = 'center';
+    bar.style.flexWrap = 'wrap';
 
     const pngBtn = document.createElement('button');
     pngBtn.textContent = '📷 Download PNG';
@@ -433,6 +444,68 @@ function buildExportToolbar(onPng, onPdf) {
 
     bar.appendChild(pngBtn);
     bar.appendChild(pdfBtn);
+
+    // Create the palette selector container
+    const selector = document.createElement('div');
+    selector.className = 'palette-selector';
+    selector.style.display = 'flex';
+    selector.style.alignItems = 'center';
+    selector.style.gap = '12px';
+    selector.style.marginLeft = 'auto';
+    selector.style.background = 'var(--surface-2)';
+    selector.style.border = '1px solid var(--border)';
+    selector.style.borderRadius = '10px';
+    selector.style.padding = '6px 12px';
+    selector.style.flexWrap = 'wrap';
+
+    const label = document.createElement('span');
+    label.textContent = 'Color Set:';
+    label.style.fontWeight = '600';
+    label.style.fontSize = '0.9rem';
+    label.style.color = 'var(--ink)';
+    selector.appendChild(label);
+
+    const options = [
+        { name: 'Classic', value: 0 },
+        { name: 'Ocean', value: 1 },
+        { name: 'Sunset', value: 2 },
+        { name: 'Botanical', value: 3 }
+    ];
+
+    options.forEach(opt => {
+        const optionLabel = document.createElement('label');
+        optionLabel.style.display = 'flex';
+        optionLabel.style.alignItems = 'center';
+        optionLabel.style.gap = '4px';
+        optionLabel.style.cursor = 'pointer';
+        optionLabel.style.fontSize = '0.85rem';
+        optionLabel.style.fontWeight = '500';
+        optionLabel.style.color = 'var(--ink)';
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'colorPalette';
+        radio.value = opt.value;
+        radio.checked = state.selectedPaletteIndex === opt.value;
+        radio.style.cursor = 'pointer';
+        radio.style.margin = '0';
+
+        radio.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                state.selectedPaletteIndex = parseInt(e.target.value, 10);
+                if (state.ui) {
+                    renderTimetable(state.ui);
+                }
+            }
+        });
+
+        optionLabel.appendChild(radio);
+        optionLabel.appendChild(document.createTextNode(' ' + opt.name));
+        selector.appendChild(optionLabel);
+    });
+
+    bar.appendChild(selector);
+
     return bar;
 }
 

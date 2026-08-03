@@ -240,8 +240,11 @@ function normalizeGroupHeader(table, groupKey) {
     `;
 }
 
-// Clean up the table by removing generator watermark
+// Clean up the table by removing generator watermark and default HTML border attributes
 function sanitizeTimetable(table) {
+    table.removeAttribute('border');
+    table.querySelectorAll('table').forEach(t => t.removeAttribute('border'));
+
     table.querySelectorAll('.foot, td, th').forEach(node => {
         if (/timetable\s+generated\s+with\s+fet/i.test(node.textContent || '')) {
             node.remove();
